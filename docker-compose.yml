@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  tg-test-bots-menu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tg-test-bots-menu
+    ports:
+      - "8000:8000"
+    environment:
+      - TEST_BOT_TOKEN=${TEST_BOT_TOKEN}
+      - TG_TEST_BOTS_AUTH_TOKEN=${TG_TEST_BOTS_AUTH_TOKEN}
+      - TENCENTCLOUD_SECRET_ID=${TENCENTCLOUD_SECRET_ID}
+      - TENCENTCLOUD_SECRET_KEY=${TENCENTCLOUD_SECRET_KEY}
+      - TENCENTCLOUD_REGION=${TENCENTCLOUD_REGION:-ap-guangzhou}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
