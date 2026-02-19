@@ -30,7 +30,7 @@ async function streamToBase64(stream: ReadableStream<Uint8Array>): Promise<strin
   return btoa(binary)
 }
 
-async function sha256(message: string, secret: string = ""): Promise<Uint8Array> {
+async function sha256(message: string, secret: string = ""): Promise<ArrayBuffer> {
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(secret),
@@ -41,12 +41,13 @@ async function sha256(message: string, secret: string = ""): Promise<Uint8Array>
   return await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(message))
 }
 
-function getHash(message: string): string {
-  return Array.from(
-    new Uint8Array(
-      crypto.createHash("sha256").update(new TextEncoder().encode(message)).digest()
-    )
-  ).map(b => b.toString(16).padStart(2, '0')).join('')
+async function getHash(message: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(message)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
 }
 
 function getDate(timestamp: number): string {
@@ -72,7 +73,7 @@ async function callTencentOCRWithBase64(imageBase64: string): Promise<any> {
   const payload = JSON.stringify({ ImageBase64: imageBase64, Language: "auto" })
 
   const signedHeaders = "content-type;host"
-  const hashedRequestPayload = getHash(payload)
+  const hashedRequestPayload = await getHash(payload)
   const httpRequestMethod = "POST"
   const canonicalUri = "/"
   const canonicalQueryString = ""
@@ -89,7 +90,7 @@ async function callTencentOCRWithBase64(imageBase64: string): Promise<any> {
     hashedRequestPayload
 
   const algorithm = "TC3-HMAC-SHA256"
-  const hashedCanonicalRequest = getHash(canonicalRequest)
+  const hashedCanonicalRequest = await getHash(canonicalRequest)
   const credentialScope = date + "/" + service + "/" + "tc3_request"
   const stringToSign =
     algorithm + "\n" +

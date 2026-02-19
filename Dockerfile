@@ -1,11 +1,12 @@
-FROM denoland/deno:alpine-1.45.0
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY supabase/functions/tg-test-bots-menu/index.ts ./index.ts
+COPY package*.json ./
+RUN npm install --production
 
-RUN deno cache --reload ./index.ts
+COPY *.js ./
 
 EXPOSE 8000
 
-CMD ["deno", "run", "--allow-net", "--allow-env", "--allow-read", "index.ts"]
+CMD ["npm", "start"]

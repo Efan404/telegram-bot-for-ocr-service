@@ -1,0 +1,11 @@
+{
+  "name": "tg-test-bots-menu",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "tencentcloud-sdk-nodejs-ocr": "^4.1.186"
+  }
+}

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   tg-test-bots-menu:
     build:
@@ -9,11 +7,17 @@ services:
     ports:
       - "8000:8000"
     environment:
+      # Telegram Bot 配置
       - TEST_BOT_TOKEN=${TEST_BOT_TOKEN}
       - TG_TEST_BOTS_AUTH_TOKEN=${TG_TEST_BOTS_AUTH_TOKEN}
+      # 腾讯云 OCR 配置
       - TENCENTCLOUD_SECRET_ID=${TENCENTCLOUD_SECRET_ID}
       - TENCENTCLOUD_SECRET_KEY=${TENCENTCLOUD_SECRET_KEY}
       - TENCENTCLOUD_REGION=${TENCENTCLOUD_REGION:-ap-guangzhou}
+      # AI LLM 配置
+      - AI_BASE_URL=${AI_BASE_URL}
+      - AI_API_KEY=${AI_API_KEY}
+      - LLM_MODEL=${LLM_MODEL:-deepseek/deepseek-v3.2-251201}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:8000/health"]
